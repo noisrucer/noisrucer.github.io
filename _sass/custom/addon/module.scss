@@ -1,0 +1,34 @@
+%section {
+    #core-wrapper & {
+        margin-bottom: 2rem;
+    }
+}
+
+/* ---------- scss placeholder --------- */
+
+%heading {
+    font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+// %link-hover {
+//     color: rgb(85, 125, 157) !important;
+//     border-bottom: 1px solid #4f728c;
+// }
+
+%img-caption {
+    +em {
+        font-size: 85%;
+    }
+}
+
+/* add effects on links */
+.post-tail-wrapper .post-meta a:not(:hover), .post-content a:not(.img-link) {
+    border-bottom: 1px dashed var(--link-underline-color); 
+}
+
+%link-hover {
+    color: var(--link-color) !important;
+    background: linear-gradient(180deg, #ffffff00 65%, var(--link-hover-bcolor) 35%);
+    border-bottom: 2px dashed var(--link-hover-lcolor);    
+}
