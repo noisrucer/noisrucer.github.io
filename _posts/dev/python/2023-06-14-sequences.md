@@ -18,7 +18,7 @@ Sequence can be categorized into two types depending on the type of element it h
 
 <span class="hl">Container sequences</span> hold items of different types. It's important to note that a container sequence hold references to the object it contains. `list`, `tuple`, `collections.deque` are the examples of container sequences.
 
-On the other hand, a <span class="hl">flat sequence</span> stores the value of its contents in its own memory space not as Python objects. Hence, flat sequences take up much less memory space. `str`, `bytes`, and `array.array` are some examples of flat sequence. 
+On the other hand, a <span class="hl">flat sequence</span> stores the value of its contents in its own memory space not as Python objects. Hence, flat sequences take up much less memory space. `str`, `bytes`, and `array.array` are some examples of flat sequence.
 
 ## Every Python object has a header with metadata
 Every Python object in memory has a header with metadata.
