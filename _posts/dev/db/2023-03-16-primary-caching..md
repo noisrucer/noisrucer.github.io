@@ -17,7 +17,6 @@ math: true
 
 You can use `girok showtask` to query all tasks without any filtering.
 
-![](/assets/img/temp/Pasted%20image%2020230330232605.png)
 If you want to query tasks belonging to only a specific category, then you can pass `-c <category path>` option.
 
 ![](/assets/img/temp/Pasted%20image%2020230330232715.png)
