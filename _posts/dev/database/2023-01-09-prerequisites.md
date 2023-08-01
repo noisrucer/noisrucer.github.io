@@ -1,8 +1,8 @@
 ---
 title: "Modeling Composite Course Prerequisites in Database"
 subtitle: ""
-categories: ['Dev', 'Database']
-tags: ['db']
+categories: [Dev, Database]
+tags: [db]
 ---
 
 1. Introduction
