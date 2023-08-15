@@ -1,8 +1,8 @@
 ---
 title: "Modeling Hierarchical Directory Tree with FastAPI and SQLAlchemy (Visualize with Typer & Rich library)"
 subtitle: ""
-categories: ['Dev', 'Database']
-tags: ['db']
+categories: [Dev, Database]
+tags: [db]
 ---
 
 1. Introduction
