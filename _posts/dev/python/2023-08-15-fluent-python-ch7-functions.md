@@ -9,6 +9,7 @@ math: true
 - [2. Higher-Order Functions](#2-higher-order-functions)
 - [3. List Comprehension: Modern Replacement for map, filter, and reduce](#3-list-comprehension-modern-replacement-for-map-filter-and-reduce)
 - [3. Anonymous Functions](#3-anonymous-functions)
+- [The Nine Flavors of Callable Objects](#the-nine-flavors-of-callable-objects)
 
 ## 1. Treating a Function Like an Object
 
@@ -82,3 +83,9 @@ print(list(map(factorial, range(11)))) # [1, 1, 2, 6, ..., 3628800]
     4. Remove the comment.
   * In summary, don't use lambda in most cases.
 
+## The Nine Flavors of Callable Objects
+* The call operator `()` may be applied to other callable objects besides functions.
+* To check whether an object is callable, use `callable()` built-in function.
+* As of Python 3.9, there're **9 callable types**
+    1. User-defined functions
+    2. Built-in functions
