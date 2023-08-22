@@ -8,8 +8,13 @@ math: true
 - [1. Treating a Function Like an Object](#1-treating-a-function-like-an-object)
 - [2. Higher-Order Functions](#2-higher-order-functions)
 - [3. List Comprehension: Modern Replacement for map, filter, and reduce](#3-list-comprehension-modern-replacement-for-map-filter-and-reduce)
-- [3. Anonymous Functions](#3-anonymous-functions)
-- [The Nine Flavors of Callable Objects](#the-nine-flavors-of-callable-objects)
+- [4. Anonymous Functions](#4-anonymous-functions)
+- [5. The Nine Flavors of Callable Objects](#5-the-nine-flavors-of-callable-objects)
+- [6. User-Defined Callable Types](#6-user-defined-callable-types)
+- [7. From Positional to Keyword-Only Paramaters](#7-from-positional-to-keyword-only-paramaters)
+- [8. Positional-Only Parameters](#8-positional-only-parameters)
+- [9. Packages for Functional Programming](#9-packages-for-functional-programming)
+- [10. Freezing Arguments with `functools.partial`](#10-freezing-arguments-with-functoolspartial)
 
 ## 1. Treating a Function Like an Object
 
@@ -67,7 +72,7 @@ print(list(map(factorial, range(11)))) # [1, 1, 2, 6, ..., 3628800]
   * `reduce` can be replaced by `sum` (other reducing built-ins are `all` and `any`)
   * `reduce(add, range(100))` -> `sum(range(100))`
 
-## 3. Anonymous Functions
+## 4. Anonymous Functions
 * `lambda` creates an anonymous function
 * The best use of `lambda` is for an argument list for a **higher-order function**.
     ```python
@@ -83,9 +88,100 @@ print(list(map(factorial, range(11)))) # [1, 1, 2, 6, ..., 3628800]
     4. Remove the comment.
   * In summary, don't use lambda in most cases.
 
-## The Nine Flavors of Callable Objects
+## 5. The Nine Flavors of Callable Objects
 * The call operator `()` may be applied to other callable objects besides functions.
 * To check whether an object is callable, use `callable()` built-in function.
 * As of Python 3.9, there're **9 callable types**
-    1. User-defined functions
-    2. Built-in functions
+    1. **User-defined functions**: `def` or `lambda`
+    3. **Built-in functions**: Functions implemented in `C` (for CPython) like `len` and `time.strftime`
+    4. **Built-in methods**: `dict.get()`
+    5. **Methods**
+    6. **Classes**: When invoked, a class runs its `__new__` method to create an instance, then `__init__` to initialize it. 
+    7. **Class instances**: If a class defines a `__call__` method, its instances may be invoked
+    8. **Generator functions**: Functions/methods that use `yield` keyword in the body. When called, return a generator object.
+    9. **Native coroutine functions**: Functions/methods defined with `async def`. When called, they return a coroutine object. Added in Python 3.5
+    10. **Asynchronous generator functions**: Functions/methods defined with `async def` that have `yield` in their body. When called, they return an asynchronous generator for use with `async for`.
+
+## 6. User-Defined Callable Types
+
+```python
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+    def __call__(self):
+        print(f"Hello, I'm {self.name}!")
+
+
+p = Person("jason")
+p() # Hello, I'm jason!
+print(callable(p)) # True
+```
+
+* Arbitrary Python objects can behave like functions when implementing `__call__` instance method.
+* Another use case of `__call__` is **decorator**.
+
+
+## 7. From Positional to Keyword-Only Paramaters
+* `*` and `**` to handle parameters
+* To specify keyword-only arguments, name them after the argument prefixed with `*`
+* If don't want to support variable positional arguments but want keyword-only arguments, put a `*` by itself in the signature.
+  * Keyword-only arguments do not need to have a default value like the example below.
+  ```python
+  def f(a, *, b):
+    return a, b
+  >>> f(1, b=2) # (1, 2)
+  >>> f(1, 2) # error
+  ```
+
+
+## 8. Positional-Only Parameters
+
+* Since Python 3.8, user-defined functions can have positional-only arguments
+* Use `/` to define a function requiring positional-only arguments.
+  ```python
+  def f(a, b, /):
+    return a * b
+  ```
+  All the params before `/` are positional-only arguments.
+
+
+## 9. Packages for Functional Programming
+
+### `operator` module <!-- omit from toc -->
+* It's often convenient to use an arithmetic operator as a function. (Ex. Multiply a list of numbers)
+* To perform summation, we have `sum` but we don't have an equivalent for multiplication. We can use `reduce` but then we would have to implement a multiplication function.
+* Instead we can use `mul` function from `operator` module.
+  ```python
+  from functools import reduce
+  from operator import mul
+
+  def factorial(n):
+    return reduce(mul, range(1, n + 1))
+  ```
+* We can use `operator` module to **pick items** from or **read attributes** from objects using `itemgetter` and `attrgetter`.
+  ```python
+  metro_data = [
+    ('Tokyo', 'JP', 36.934),
+    ('Seoul', 'KR', 340.23),
+    ('Mexico City', 'MX', 20.142)
+  ]
+
+  from operator import itemgetter
+  for city in sorted(metro_data, key=itemgetter(1)): 
+    print(city)
+  ```
+  * We can also pass multiple index args to `itemgetter`, then it returns tuples with the extract values. (ex. `intemgetter(1, 0)`)
+* `itemgetter` uses `[]` operator so it can be used for any object that implements `__getitem__`
+* A sibling is `attrgetter` which creates functions to extract object attributes **by name**.
+
+
+## 10. Freezing Arguments with `functools.partial`
+* What `partial` does is given a callable, it produces a new callable with some of the args of the original callable bound to predetermined values.
+```python
+from operator import mul
+from functools import partial
+triple = partial(mul, 3) # predetermined arg 3
+>>> triple(7) # 21
+>>> list(map(triple, range(1, 10))) # [3, 6, 9, 12, 15, 18, 21, 24, 27]
+```

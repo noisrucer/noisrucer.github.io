@@ -20,7 +20,6 @@ math: true
 
 
 ## 1. Variables are not boxes, but labels <a name="d1"></a>
-
 * Variables are not boxes, but merely **labels** attached to objects.
 * `b = a` does not copy the contents of a into b, but **attaches the label b** to the object that already has the label a.
     ```python
@@ -112,7 +111,7 @@ print(id(tup[-1]))  # 123456
 
 ## 5. Shallow vs Deep Copy <a name="d5"></a>
 
-### Shallow Copy
+### Shallow Copy 
 Shallow copy is a copy where the **outermost container is duplicated**, but the copy is filled with **references to the same items** hold by the original container.
 
 This saves memory and causes no problem if all the items are immutable, but if there're **mutable** items, it might cause problems
