@@ -350,3 +350,155 @@ def func2(lst: Iterable[int]) -> int:
   * Despite this potential danger, it's common to offer functions that accept `Iterable` to allow the caller to provide the input data as **generator** to save a lot of memory
 * `Sequence`
   * `func2` must accept `Sequence` because it must get the `len()` of the input.
+
+## Parameterized Generics and TypeVar
+
+A parametrized generic is a **generic type**, written as `list[T]`
+* `T`: **Type variable** that will be bound to a specific type with each usage
+
+```python
+from collections.abc import Sequence
+from random import shuffle
+from typing import TypeVar
+
+T = TypeVar('T')
+
+def sample(population: Sequence[T], size: int) -> list[T]:
+  result = list(population)
+  shuffle(result)
+  return result[:size]
+```
+* In the example, `T` is a type variable.
+* If `population` is a sequence with `int`, then the return type is `list[int]`
+* If `population` is a sequence with `str`, then the return type is `list[str]`
+
+Let's take another example.
+
+```python
+from collections import Counter
+from collections.abc import Iterable
+
+def mode(data: Iterable[float]) -> float:
+  pairs = Counter(data).most_common(1)
+  if len(pairs) == 0:
+    raise ValueError('no mode for empty data')
+  return pairs[0][0]
+```
+
+We have a problem here. Some users might want to find the mode among `int` or other numerical types (Complex, etc).
+
+Let's improve it using `TypeVar`.
+
+```python
+from collections import Counter
+from collections.abc import Iterable
+from typing import TypeVar
+
+T = TypeVar('T')
+
+def mode(data: Iterable[T]) -> T:
+  pairs = Counter(data).most_common(1)
+  if len(pairs) == 0:
+    raise ValueError('no mode for empty data')
+  return pairs[0][0]
+```
+
+In the improved version, the type parameter `T` can be **any type including the unhashables** which `collections.Counter` cannot handle.
+
+Hence, we need to restrict the possible types assigned to `T`.
+
+### Restricted TypeVar
+
+```python
+from typing import TypeVar
+
+NumberT = TypeVar('NumberT', float, Decimal, Fraction)
+
+def mode(data: Iterable[NumberT]) -> NumberT:
+  ...
+```
+
+It's better than before. But we still have a problem. Some users might want to pass `str` or `tuple` types to find the mode. Then, the name `NumberT` is very misleading.
+
+### Bounded TypeVar
+
+To solve that problem, we can use **bounded TypeVar**
+
+```python
+from collections.abc import Iterable, Hashable
+from typing import TypeVar
+
+HashableT = TypeVar('HashableT', bound=Hashable)
+
+def mode(data: Iterable[HashableT]) -> HashableT:
+  ...
+```
+
+A bounded type variable will be set to the **inferred type** of the expression as long as the inferred type is **consistent-with the boundary** declared in the `bound=...` keyword.
+
+## Static Protocols
+
+In Python, a **protocol** definition, similar to interfaces in Go, is written as `typing.Protocol` **subclass**.
+* A protocol type is defined by **specifying one or more methods**
+* And the type-checker verifies that those methods are implemented where that protocol type is required.
+* In short, a protocol defines an interface that a type-checker can verify
+
+> Classes that <span class="hl">implement</span> a protocol do not need to inherit, register, or declare any relationship with the class that <span class="hl">defines</span> the protocol.
+{: .prompt-info}
+
+Let's look at an example.
+
+Suppose `top(it, n)` is a function that returns the largest `n` elements of the given iterable `it`.
+
+```python
+def top(series: Iterable[T], length: int) -> list[T]:
+  ordered = sorted(series, reverse=True)
+  return ordered[:length]
+
+>>> top([4, 1, 5, 2, 6, 7, 3], 3)
+[7, 6, 5]
+
+>>> l = 'mango pear apple kiwi banana'.split()
+>>> top(l, 3)
+['pear', 'mango', 'kiwi']
+```
+
+Now the problem is: **"How to constrain T?"**
+
+It cannot be any type such as `Any` or `object` because `series` must work with `sorted`.
+* `sortes` actually accepts `Iterable[Any]`, but it's just because the optional param `key` takes a compare function for sorting.
+* What if you give `sorted` a list of plain objects without providing `key` argument? It will throw an error.
+  ![Alt text](/assets/img/python/ch8-4.png)
+* The error message shows that `sorted` uses `<` operator.
+
+More specifically, `T` type param should be limited to types that implement `__lt__`.
+
+We can deal with this problem using `typing.Protocol`
+
+```python
+from typing import Protocol, Any
+
+class SupportsLessThan(Protocol):
+  def __lt__(self, other: Any) -> bool: ...
+```
+
+* A **protocol** is a **subclass** of `typing.Protocol`
+* The body of the protocol has one or more method definitions, with `...` in their bodies.
+
+A type `T` is **consistent-with** a protocol `P` **if** `T` **implements all the methods defined in** `P`, with matching type signatures
+
+Now let's use it to complete `top` function.
+
+```python
+from collections.abc import Iterable
+from typing import TypeVar
+
+from comparable import SupportsLessThan
+
+LT = TypeVar('LT', bound=SupportsLessThan) # using bound TypeVar
+
+def top(series: Iterable[LT], length: int) -> list[LT]:
+  ordered = sorted(series, reverse=True)
+  return ordered[:length]
+```
+
