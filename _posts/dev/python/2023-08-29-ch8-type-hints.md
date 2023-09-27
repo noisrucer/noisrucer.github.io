@@ -501,4 +501,3 @@ def top(series: Iterable[LT], length: int) -> list[LT]:
   ordered = sorted(series, reverse=True)
   return ordered[:length]
 ```
-
