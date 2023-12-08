@@ -8,7 +8,7 @@ math: true
 
 # 1. Introduction
 
-In the previous articles, [we created a docker image of a simple FastAPI project](https://noisrucer.github.io/dev/2023/03/25/dockerize/) and [deployed it to AWS ECS Fargate](https://noisrucer.github.io/dev/2023/03/28/deploy-ecs/).
+In the previous articles, [we created a docker image of a simple FastAPI project](https://noisrucer.github.io/posts/dockerize/) and [deployed it to AWS ECS Fargate](https://noisrucer.github.io/posts/deploy-ecs/).
 
 Most of the times, we deal with environment variables such as database connection info or some other 3rd-party API secret keys.
 In this article, we'll talk about how we can manage environment variables in AWS server.
